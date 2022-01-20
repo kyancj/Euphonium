@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "euphonium-mod",
+  "version": "${version}",
+
+  "name": "NUBot",
+  "description": "This is the Euphonium Minecraft Bot developed by Carlito Ancheta.",
+  "authors": [
+    "Carlito Ancheta"
+  ],
+  "contact": {},
+
+  "license": "MIT",
+  "icon": "assets/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [],
+    "client": [
+    	"net.cancheta.EuphoniumClient"
+    ]
+  },
+  "mixins": [
+    "mixins.Euphonium.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.12.1",
+    "fabric": "*",
+    "fabric-key-binding-api-v1": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

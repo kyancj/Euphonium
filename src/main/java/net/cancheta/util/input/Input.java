@@ -1,6 +1,5 @@
 package net.cancheta.util.input;
 
-
 public enum Input {	
     MOVE_FORWARD,
     MOVE_BACK,
