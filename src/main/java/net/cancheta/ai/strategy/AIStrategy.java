@@ -7,7 +7,8 @@ public abstract class AIStrategy {
 		TICK_AGAIN,
 		TICK_HANDLED,
 		NO_MORE_WORK,
-		ABORT
+		ABORT,
+		HELLO;
 	};
 	private boolean active;
 	
