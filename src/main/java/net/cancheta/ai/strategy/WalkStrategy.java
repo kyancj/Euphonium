@@ -1,25 +1,59 @@
 package net.cancheta.ai.strategy;
 
+import java.util.LinkedList;
+
 import net.cancheta.ai.task.WalkTask;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.cancheta.util.KeyRegister;
 
 public class WalkStrategy extends AIStrategy{
+	private MinecraftClient mc = MinecraftClient.getInstance();
 	protected BlockPos target;
 	protected ServerCommandSource source;
-	protected ServerPlayerEntity player;
+	protected ClientPlayerEntity player;
 	private static final int TICK_AGAIN_EVERY = 20 * 5;
 	private int tickAgainCounter = TICK_AGAIN_EVERY;
 	
-	public WalkStrategy(ServerCommandSource source, ServerPlayerEntity player, BlockPos target) {
+	public WalkStrategy(ServerCommandSource source, BlockPos target) {
 		this.target = target;
 		this.source = source;
-		this.player = player;
+		this.player = mc.player;
+	}
+	
+	private boolean abort() {
+		if (KeyRegister.stop.isPressed()) {
+			return true;
+		}
+		return false;
+	}
+	
+	public TickResult run(WalkTask walk) {
+		LinkedList<BlockPos> l = new LinkedList<BlockPos>();
+		l.add(new BlockPos(1, 4, 1));
+		l.add(new BlockPos(2, 4, 1));
+		l.add(new BlockPos(3, 4, 1));
+		l.add(new BlockPos(3, 4, 2));
+		BlockPos nextBlock;
+		TickResult result = null;
+		while(!l.isEmpty()) {
+			nextBlock = l.removeFirst();
+			this.target = nextBlock;
+			result = onGameTick(walk);
+			System.out.println(result);
+			if (result == TickResult.ABORT) {
+				return result;
+			}
+		}
+		return result;
 	}
 	
 	public TickResult onGameTick(WalkTask walk) {  //TickResult extends from AIStrategy
-		if (tickAgainCounter-- <= 0) {
+		if (abort()) {
+			return TickResult.ABORT;
+		} else if (tickAgainCounter-- <= 0) {
 			tickAgainCounter = TICK_AGAIN_EVERY;
 			return TickResult.TICK_AGAIN;
 		} else if (walk.walkTowards(source, player, target.getX(), target.getY(), target.getZ())) {

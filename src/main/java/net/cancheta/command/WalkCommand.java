@@ -5,7 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.command.CommandManager;
 
 import net.minecraft.text.TranslatableText;
@@ -13,6 +12,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.cancheta.ai.strategy.AIStrategy.TickResult;
 import net.cancheta.ai.strategy.WalkStrategy;
 import net.cancheta.ai.task.WalkTask;
 import net.minecraft.command.argument.PosArgument;
@@ -35,13 +35,18 @@ public class WalkCommand {
 	private static int run(ServerCommandSource source, PosArgument location) throws CommandSyntaxException {
 		WalkTask task = new WalkTask();
 		Vec3d vec3d = location.toAbsolutePos(source);
-		ServerPlayerEntity player = source.getPlayer();
+//		ServerPlayerEntity player = source.getPlayer();
 		BlockPos target = new BlockPos(vec3d.x, vec3d.y, vec3d.z);
 		if (!World.isValid(target)) { //Check if block is valid
 			throw INVALID_POSITION_EXCEPTION.create();
 		}
-		WalkStrategy walk = new WalkStrategy(source, player, target);
-		walk.onGameTick(task); //This line needs to be done on every tick.
+		WalkStrategy walk = new WalkStrategy(source, target);
+		while (true) { //This line needs to be done on every tick.
+			TickResult result = walk.onGameTick(task);
+			if (result == TickResult.NO_MORE_WORK || result == TickResult.ABORT) {
+				break;
+			}
+		}
 		return 1;
 	}
 }

@@ -4,7 +4,6 @@ package net.cancheta;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.cancheta.util.ModCommandRegister;
-import net.cancheta.ai.task.WalkTask;
 import net.cancheta.util.KeyRegister;
 
 
