@@ -18,6 +18,13 @@ import net.cancheta.ai.task.WalkTask;
 import net.minecraft.command.argument.PosArgument;
 import net.minecraft.command.argument.Vec3ArgumentType;
 
+//import net.minecraft.entity.ai.pathing.PathNodeMaker;
+//import net.minecraft.entity.ai.pathing.EntityNavigation;
+//import net.minecraft.entity.ai.pathing.Path;
+//import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
+//import net.minecraft.entity.ai.pathing.MobNavigation;
+//import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
+
 
 public class WalkCommand {
 	private static final SimpleCommandExceptionType INVALID_POSITION_EXCEPTION =
@@ -37,15 +44,15 @@ public class WalkCommand {
 		Vec3d vec3d = location.toAbsolutePos(source);
 //		ServerPlayerEntity player = source.getPlayer();
 		BlockPos target = new BlockPos(vec3d.x, vec3d.y, vec3d.z);
+		
 		if (!World.isValid(target)) { //Check if block is valid
 			throw INVALID_POSITION_EXCEPTION.create();
 		}
+		
 		WalkStrategy walk = new WalkStrategy(source, target);
-		while (true) { //This line needs to be done on every tick.
-			TickResult result = walk.onGameTick(task);
-			if (result == TickResult.NO_MORE_WORK || result == TickResult.ABORT) {
-				break;
-			}
+		TickResult result = walk.run(task);
+		if (result == TickResult.NO_MORE_WORK || result == TickResult.ABORT) {
+			// Send error message or complete?
 		}
 		return 1;
 	}

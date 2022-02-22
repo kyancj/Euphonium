@@ -2,6 +2,7 @@ package net.cancheta.ai.strategy;
 
 import java.util.LinkedList;
 
+import net.cancheta.ai.path.Pathfind;
 import net.cancheta.ai.task.WalkTask;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -31,11 +32,9 @@ public class WalkStrategy extends AIStrategy{
 	}
 	
 	public TickResult run(WalkTask walk) {
-		LinkedList<BlockPos> l = new LinkedList<BlockPos>();
-		l.add(new BlockPos(1, 4, 1));
-		l.add(new BlockPos(2, 4, 1));
-		l.add(new BlockPos(3, 4, 1));
-		l.add(new BlockPos(3, 4, 2));
+		Pathfind pathfinder = new Pathfind(player.getBlockPos(), target);
+		pathfinder.findPath();
+		LinkedList<BlockPos> l = pathfinder.getPath();
 		BlockPos nextBlock;
 		TickResult result = null;
 		while(!l.isEmpty()) {

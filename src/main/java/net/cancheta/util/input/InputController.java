@@ -84,9 +84,7 @@ public class InputController {
 				KeyBinding.setKeyPressed(fakeKey, true);
 				KeyBinding.onKeyPressed(fakeKey);
 			}
-//			if (!binding.isKeyDown()) {
-//				LOGGER.error(MARKER_KEY, "Key press simulated but key is not pressed: " + key);
-//			}
+
 		} else {
 			if (wasOverride) {
 				KeyBinding.setKeyPressed(fakeKey, false);
