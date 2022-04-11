@@ -1,4 +1,4 @@
-package net.cancheta.command;
+package net.cancheta.ai.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

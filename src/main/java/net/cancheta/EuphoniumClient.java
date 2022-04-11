@@ -2,27 +2,19 @@ package net.cancheta;
 
 //import net.cancheta.ai.AIController;
 import net.fabricmc.api.ClientModInitializer;
-
 import net.cancheta.util.ModCommandRegister;
+import net.cancheta.ai.commands.Commands;
+import net.cancheta.ai.commands.WalkCommand;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.cancheta.ai.command.IAIControllable;
 import net.cancheta.util.KeyRegister;
 
 
-public class EuphoniumClient implements ClientModInitializer {
-//	public static boolean running = true;
-//	public static int lastPressedToggleKey = 0;
-//	public static Logger LOGGER = LogManager.getLogger("NU Bot");
-//	
-//	public static KeyBinding start = new KeyBinding("Start Bot", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_F12, "NU Bot");
-//	public static KeyBinding stop = new KeyBinding("Stop Bot", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_BRACKET, "NU Bot");
-//	
-	@Override
-	public void onInitializeClient() {
-//		LOGGER.info("Loading NU Bot.");
-//		start = KeyBindingHelper.registerKeyBinding(start);
-//		stop = KeyBindingHelper.registerKeyBinding(stop);
-//		
-		ModCommandRegister.registerCommands();
-		KeyRegister.registerKeys();
-	}
 
+public class EuphoniumClient implements ClientModInitializer {
+	public void onInitializeClient() {
+//		LiteralArgumentBuilder<IAIControllable> euphonium = null;
+//		LiteralArgumentBuilder<IAIControllable> minebuild = null;
+//		Commands.register(euphonium, minebuild);
+	}
 }

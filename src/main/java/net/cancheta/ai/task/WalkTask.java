@@ -8,6 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Vec3d;
 
+@Deprecated
 public class WalkTask {
 	private final Key forward = InputUtil.fromKeyCode(87, 0);
 	private final double MIN_DISTANCE_ERROR = 1;
