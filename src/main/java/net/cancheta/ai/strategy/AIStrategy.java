@@ -1,6 +1,7 @@
 package net.cancheta.ai.strategy;
 
 import net.cancheta.ai.AIHelper;
+import net.minecraft.client.MinecraftClient;
 
 public abstract class AIStrategy {
 	public enum TickResult{
@@ -30,12 +31,14 @@ public abstract class AIStrategy {
 	public final boolean isActive() { return active;}
 	
 	protected void onActivate(AIHelper helper) {
-		oldAutoJump = helper.getClient().options.autoJump;
-		helper.getClient().options.autoJump = false;
+		MinecraftClient mc = helper.getClient();
+		oldAutoJump = mc.options.autoJump;
+		mc.options.autoJump = false;
 	}
 	
 	protected void onDeactivate(AIHelper helper) {
-		helper.getClient().options.autoJump = oldAutoJump;
+		MinecraftClient mc = helper.getClient();
+		mc.options.autoJump = oldAutoJump;
 	}
 	
 	public boolean takesOverAnyTime() {

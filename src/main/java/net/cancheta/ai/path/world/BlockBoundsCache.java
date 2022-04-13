@@ -132,7 +132,13 @@ public abstract class BlockBoundsCache {
         }
 
         private class CannotComputeBounds extends RuntimeException {
-            public CannotComputeBounds(String message) {
+
+			/**
+			 * AUTO GENERATED
+			 */
+			private static final long serialVersionUID = 9122518019528900735L;
+
+			public CannotComputeBounds(String message) {
                 super(message);
             }
         }

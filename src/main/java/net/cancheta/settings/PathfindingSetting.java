@@ -16,8 +16,6 @@ public class PathfindingSetting {
 	
 	private BlockSet upwardsBuildBlocks;
 	
-	private String help = "With this, you can add your custom mod blocks to the path finder. Modify this with care. Delete the whole entry to reset to default.";
-	
 	public PathfindingSetting() {
 		// for json parsing
 	}

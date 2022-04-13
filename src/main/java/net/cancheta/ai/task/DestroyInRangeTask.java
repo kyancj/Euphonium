@@ -8,14 +8,17 @@ import net.cancheta.ai.utils.BlockArea;
 import net.cancheta.ai.utils.BlockArea.AreaVisitor;
 import net.cancheta.ai.utils.BlockCuboid;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,8 +110,10 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		if (noDestructionRequired(aiHelper.getWorld(), x, y, z)) {
 			return -1;
 		} else {
-			double distanceSq = aiHelper.getClient().player.squaredDistanceTo(x + .5, y
-					+ .5 - aiHelper.getClient().player.getEyeY(), z + .5);
+			MinecraftClient mc = aiHelper.getClient();
+			ClientPlayerEntity player = mc.player;
+			double distanceSq = player.squaredDistanceTo(x + .5, y
+					+ .5 - player.getEyeY(), z + .5);
 			double distance = Math.sqrt(distanceSq);
 
 			// Use the change in player rotation as well => this prevents the player from spinning a lot
@@ -172,7 +177,6 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 				LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Scheduled block is {}. Facing block at position {} and destrying it", destructPos, pos);
 				aiHelper.selectToolFor(pos);
 				aiHelper.overrideAttack();
-				aiHelper.getStats().markIntentionalBlockBreak(pos);
 				facingAttempts = 0;
 			} else {
 				LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Facing block to destroy at {}", facingPos);

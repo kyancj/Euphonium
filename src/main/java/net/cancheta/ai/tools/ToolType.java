@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public final class ToolType {
     private static final Pattern VALID_NAME = Pattern.compile("[^a-z_]");
-    private static final Map<String, ToolType> VALUES = new ConcurrentHashMap();
+    private static final Map<String, ToolType> VALUES = new ConcurrentHashMap<String, ToolType>();
     public static final ToolType AXE = get("axe");
     public static final ToolType HOE = get("hoe");
     public static final ToolType PICKAXE = get("pickaxe");

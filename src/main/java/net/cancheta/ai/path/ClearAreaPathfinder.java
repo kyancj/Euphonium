@@ -25,7 +25,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	private int topY;
-	private final BlockCuboid area;
+	private final BlockCuboid<WorldData> area;
 	private ClearMode mode;
 
 	private static final BlockSet CLEARED_BLOCKS = BlockSet.builder().add(
@@ -33,7 +33,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 
 	private final BlockSet clearedBlocks;
 
-	public ClearAreaPathfinder(BlockCuboid area,
+	public ClearAreaPathfinder(BlockCuboid<WorldData> area,
 							   BlockSet toClean, ClearMode mode) {
 		this.area = area;
 		this.mode = mode;
@@ -95,9 +95,9 @@ public class ClearAreaPathfinder extends MovePathFinder {
 				&& top.getY() > currentPos.getY() + 1) {
 			top = top.add(0, -1, 0);
 		}
-		BlockCuboid range = new BlockCuboid(currentPos, top);
+		BlockCuboid<WorldData> range = new BlockCuboid<WorldData>(currentPos, top);
 		range = range.extendXZ(mode.maxExtendXZ);
-		AreaIntersection clamped = range.intersectWith(new BlockFilteredArea(
+		AreaIntersection<WorldData> clamped = range.intersectWith(new BlockFilteredArea<WorldData>(
 				area, clearedBlocks.invert()));
 
 		addTask(new DestroyInRangeTask(clamped));
@@ -116,7 +116,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		return area.getVolume();
 	}
 
-	private class AreaTopVisitor implements AreaVisitor {
+	private class AreaTopVisitor implements AreaVisitor<WorldData>{
 		private int count = 0;
 		private int newTopY;
 

@@ -69,8 +69,8 @@ public class BlockSet implements Iterable<BlockState>{
 		return contains(world.getBlockStateId(x, y, z));
 	}
 
-	public boolean isAt(WorldData world, BlockCuboid area) {
-		return new BlockFilteredArea(area, this).getVolume(world) == area
+	public boolean isAt(WorldData world, BlockCuboid<WorldData> area) {
+		return new BlockFilteredArea<WorldData>(area, this).getVolume(world) == area
 				.getVolume(world);
 	}
 	
@@ -204,17 +204,17 @@ public class BlockSet implements Iterable<BlockState>{
 		private Builder() {
 		}
 
-		private Builder add(int stateId) {
-			statesToAdd.add(stateId);
-			return this;
-		}
+//		private Builder add(int stateId) {
+//			statesToAdd.add(stateId);
+//			return this;
+//		}
 
-		private Builder add(int... stateIds) {
-			for (int stateId : stateIds) {
-				add(stateId);
-			}
-			return this;
-		}
+//		private Builder add(int... stateIds) {
+//			for (int stateId : stateIds) {
+//				add(stateId);
+//			}
+//			return this;
+//		}
 
 		public Builder add(BlockState state) {
 			statesToAdd.add(getStateId(state));

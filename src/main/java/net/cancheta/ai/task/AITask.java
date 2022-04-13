@@ -3,6 +3,7 @@ package net.cancheta.ai.task;
 import net.cancheta.ai.AIHelper;
 import net.cancheta.ai.path.world.RecordingWorld;
 import net.cancheta.ai.path.world.WorldWithDelta;
+import net.minecraft.client.MinecraftClient;
 
 public abstract class AITask {
 	
@@ -22,8 +23,9 @@ public abstract class AITask {
 	}
 	
 	protected int computeGameTickTimeout(AIHelper helper) {
+		MinecraftClient mc = helper.getClient();
 		RecordingWorld world = new RecordingWorld(helper.getWorld(),
-				helper.getClient().player);
+				mc.player);
 		if (applyToDelta(world)) {
 			return (int) (world.getTimeInTicks() * 1.3f);
 		} else {

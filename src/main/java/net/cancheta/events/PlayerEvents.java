@@ -1,11 +1,18 @@
 package net.cancheta.events;
 
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.MinecraftClient;
+import net.cancheta.ai.AIController;
 
-public class PlayerEvents implements ServerPlayerEvents.CopyFrom {
+public class PlayerEvents implements ClientTickEvents.EndTick {
+	private AIController controller;
+	
+	public PlayerEvents(AIController controller) {
+		this.controller = controller;
+	}
+	
 	@Override
-	public void copyFromPlayer(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
-		
+	public void onEndTick(MinecraftClient client) {
+		controller.initialize(client);
 	}
 }

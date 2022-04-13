@@ -2,7 +2,6 @@ package net.cancheta.ai.utils;
 import net.cancheta.ai.path.world.Pos;
 import net.cancheta.ai.path.world.WorldData;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 public class BlockCuboid<WorldT extends WorldData> extends BlockArea<WorldT> {
 	/**

@@ -9,6 +9,7 @@ import net.cancheta.ai.task.BlockHalf;
 import net.cancheta.ai.task.TaskOperations;
 import net.cancheta.ai.task.error.SelectTaskError;
 import net.minecraft.util.math.Direction;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -110,7 +111,8 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	protected boolean isAtDesiredHeight(AIHelper aiHelper) {
-		return aiHelper.getClient().player.getBoundingBox().minY >= getPlaceAtPos()
+		MinecraftClient mc = aiHelper.getClient();
+		return mc.player.getBoundingBox().minY >= getPlaceAtPos()
 				.getY();
 	}
 

@@ -15,29 +15,22 @@ import net.cancheta.ai.task.BlockHalf;
 import net.cancheta.ai.tools.ToolRater;
 import net.cancheta.settings.EuphoniumSettings;
 import net.cancheta.settings.SaferuleSettings;
-import net.cancheta.stats.StatsManager;
 import net.cancheta.ai.input.KeyboardInputController;
 import net.cancheta.ai.input.KeyboardInputController.KeyType;
-import net.cancheta.ai.path.world.BlockBounds;
-import net.cancheta.ai.path.world.BlockBoundsCache;
 import net.cancheta.ai.path.world.Pos;
 import net.cancheta.ai.path.world.WorldData;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.pathing.PathNodeMaker;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockView;
-//import net.fabricmc.fabric.api.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 
 public abstract class AIHelper {
@@ -58,8 +51,6 @@ public abstract class AIHelper {
 	
 	private HashMap<KeyType, KeyboardInputController> keys = new HashMap<KeyType, KeyboardInputController>();
 	
-	private final StatsManager stats = new StatsManager();
-	
 	public AIHelper() {
 		for (KeyType key : KeyType.values()) {
 			keys.put(key, new KeyboardInputController(mc, key));
@@ -75,11 +66,12 @@ public abstract class AIHelper {
 	}
 	
 	public HitResult getObjectMouseOver() {
+		mc = getClient();
 		if (objectMouseOverInvalidated) {
 			objectMouseOverInvalidated = false;
-			getClient().gameRenderer.updateTargetedEntity(1.0F);
+			mc.gameRenderer.updateTargetedEntity(1.0F);
 		}
-		return getClient().crosshairTarget;
+		return mc.crosshairTarget;
 	}
 	
 	public WorldData getWorld() {
@@ -89,11 +81,13 @@ public abstract class AIHelper {
 	public abstract AIStrategy getResumeStrategy();
 	
 	public boolean isAlive() {
-		return getClient().player != null && getClient().player.getHealth() > 0.0F;
+		mc = getClient();
+		return mc.player != null && getClient().player.getHealth() > 0.0F;
 	}
 	
 	public List<Entity> getEntities(int dist, Predicate<Entity> selector){
-		List<Entity> entities = getClient().world.getOtherEntities(
+		mc = getClient();
+		List<Entity> entities = mc.world.getOtherEntities(
 				getClient().getCameraEntity(),
 				getClient().getCameraEntity().getBoundingBox()
 				.expand(-dist, -dist, -dist)
@@ -106,11 +100,11 @@ public abstract class AIHelper {
 	
 	public Entity getClosestEntity(int dist, Predicate<Entity> selector) {
 		final List<Entity> entities = getEntities(dist, selector);
-		
+		mc = getClient();
 		double mindist = Double.MAX_VALUE;
 		Entity found = null;
 		for (final Entity e : entities) {
-			final double mydist = e.distanceTo(getClient().player);
+			final double mydist = e.distanceTo(mc.player);
 			if (mydist < mindist) {
 				found = e;
 				mindist = mydist;
@@ -129,7 +123,8 @@ public abstract class AIHelper {
 	public boolean isStandingOn(int x, int y, int z) {
 		// boolean isFence = blockIsOneOf(getBlock(x, y - 1, z),
 		// FenceBuildTask.BLOCKS);
-		return Math.abs(x + 0.5 - getClient().player.getX()) < 0.2
+		mc = getClient();
+		return Math.abs(x + 0.5 - mc.player.getX()) < 0.2
 				&& Math.abs(z + 0.5 - getClient().player.getZ()) < 0.2
 				&& Math.abs(getClient().player.getBoundingBox().minY - y) < 0.52;
 	}
@@ -144,7 +139,6 @@ public abstract class AIHelper {
 			LOGGER.debug("Facing block at {} and destroying it", pos);
 			selectToolFor(pos);
 			overrideAttack();
-			stats.markIntentionalBlockBreak(pos);
 		}
 	}
 	
@@ -230,26 +224,27 @@ public abstract class AIHelper {
 	}
 	
 	public ToolRaterResult selectToolFor(final BlockPos pos, ToolRater rater) {
+		mc = getClient();
 		ToolRaterResult res = searchToolFor(pos, rater);
-		getClient().player.getInventory().selectedSlot = res.getBestSlot();
+		mc.player.getInventory().selectedSlot = res.getBestSlot();
 		return res;
 	}
 	
 	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
-		int bestRatingSlot = getClient().player.getInventory().selectedSlot;
+		mc = getClient();
+		int bestRatingSlot = mc.player.getInventory().selectedSlot;
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
 			bestRatingSlot = 0;
 		}
 		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
 		float bestRating = rater.rateTool(
-				getClient().player.getInventory().getStack(bestRatingSlot), block);
+				mc.player.getInventory().getStack(bestRatingSlot), block);
 		String bestToolName = null;
 		float hardness = 0;
 		Material material = null;
-		String resistance = null;
 		try {
-			material = getClient().world.getBlockState(pos).getMaterial();
-			hardness = getClient().world.getBlockState(pos).getBlock().getHardness();
+			material = mc.world.getBlockState(pos).getMaterial();
+			hardness = mc.world.getBlockState(pos).getBlock().getHardness();
 			bestToolName = searchForTool(material, hardness);
 			//System.out.println("BestToolName:" + bestToolName + "for block: " + getMinecraft().world.getBlockState(pos).getBlock().toString());
 		} catch (Exception ex) {
@@ -257,13 +252,14 @@ public abstract class AIHelper {
 			}
 		
 		for (int i = 0; i < 9; ++i) {
+			mc = getClient();
 			float rating = rater.rateTool(
-					getClient().player.getInventory().getStack(i), block);
+					mc.player.getInventory().getStack(i), block);
 			try {
-				Item currSlot = getClient().player.getInventory().getStack(i).getItem();
+				Item currSlot = mc.player.getInventory().getStack(i).getItem();
 				String currSlotName = currSlot.getName().getString();
-				int currSlotDurability = getClient().player.getInventory().getStack(i).getMaxDamage() -
-						getClient().player.getInventory().getStack(i).getDamage();
+				int currSlotDurability = mc.player.getInventory().getStack(i).getMaxDamage() -
+						mc.player.getInventory().getStack(i).getDamage();
 				//System.out.println("Checking Slot:" + currSlotName + " " + currSlotDurability + " for contain: " + bestToolName);
 				//System.out.println(currSlotName.toLowerCase() + "|contains|" + " " + bestToolName.toLowerCase());
 				if ((currSlotName.toLowerCase().equals(bestToolName.toLowerCase())||currSlotName.toLowerCase().contains(" " + bestToolName.toLowerCase())) && currSlotDurability > 5) {
@@ -302,10 +298,11 @@ public abstract class AIHelper {
 	}
 	
 	public void overrideMovement(Input i) {
+		mc = getClient();
 		if (resetMovementInput == null) {
-			resetMovementInput = getClient().player.input;
+			resetMovementInput = mc.player.input;
 		}
-		getClient().player.input = i;
+		mc.player.input = i;
 	}
 	
 	public void overrideUseItem() {
@@ -335,20 +332,21 @@ public abstract class AIHelper {
 	}
 	
 	public boolean walkTowards(double x, double z, boolean jump, boolean face) {
-		final double dx = x - getClient().player.getX();
-		final double dz = z - getClient().player.getZ();
+		mc = getClient();
+		final double dx = x - mc.player.getX();
+		final double dz = z - mc.player.getZ();
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		boolean arrived = distTo > MIN_DISTANCE_ERROR;
 		if (arrived) {
 			if (face) {
-				face(x, getClient().player.getStandingEyeHeight() + getClient().player.getY(), z, 1,
+				face(x, mc.player.getStandingEyeHeight() + mc.player.getY(), z, 1,
 						.1f);
 			}
 			double speed = 1;
 			if (distTo < 4 * WALK_PER_STEP) {
 				speed = Math.max(distTo / WALK_PER_STEP / 4, 0.1);
 			}
-			final double yaw = getClient().player.getYaw() / 180 * Math.PI;
+			final double yaw = mc.player.getYaw() / 180 * Math.PI;
 			final double lookX = -Math.sin(yaw);
 			final double lookZ = Math.cos(yaw);
 			final double dlength = Math.sqrt(dx * dx + dz * dz);
@@ -371,16 +369,17 @@ public abstract class AIHelper {
 	}
 	
 	public double getRequiredAngularChangeTo(double x, double y, double z) {
-		final double d0 = x - getClient().player.getX();
-		final double d1 = z - getClient().player.getZ();
-		final double d2 = y - getClient().player.getY() - getClient().player.getEyeY();
+		mc = getClient();
+		final double d0 = x - mc.player.getX();
+		final double d1 = z - mc.player.getZ();
+		final double d2 = y - mc.player.getY() - mc.player.getEyeY();
 		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
 
 		if (d3 < 2.500000277905201E-7D) {
 			return 0;
 		}
 		
-		Vec3d playerLook = getClient().player.getRotationVector().normalize();
+		Vec3d playerLook = mc.player.getRotationVector().normalize();
 		return Math.acos(playerLook.dotProduct(new Vec3d(d0, d1, d2).normalize()));
 	}
 	
@@ -392,7 +391,7 @@ public abstract class AIHelper {
 		final HitResult position = getObjectMouseOver();
 		return position != null
 				&& position.getType() == HitResult.Type.BLOCK
-				&& new BlockPos(x, y, z).equals(((BlockHitResult)position).getPos())
+				&& new BlockPos(x, y, z).equals(((BlockHitResult)position).getBlockPos())
 				&& (y < 255 || allowTopOfWorldHit() || ((BlockHitResult)position).getSide() != Direction.UP);
 	}
 	
@@ -450,14 +449,15 @@ public abstract class AIHelper {
 	
 	private boolean face(double x, double y, double z, float yawInfluence,
 			float pitchInfluence) {
-		final double d0 = x - getClient().player.getX();
-		final double d1 = z - getClient().player.getZ();
-		final double d2 = y - getClient().player.getY() - getClient().player.getStandingEyeHeight();
+		mc = getClient();
+		final double d0 = x - mc.player.getX();
+		final double d1 = z - mc.player.getZ();
+		final double d2 = y - mc.player.getY() - mc.player.getStandingEyeHeight();
 		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
 
 		if (d3 >= 2.500000277905201E-7D) {
-			final float rotationYaw = getClient().player.getYaw();
-			final float rotationPitch = getClient().player.getPitch();
+			final float rotationYaw = mc.player.getYaw();
+			final float rotationPitch = mc.player.getPitch();
 
 			final float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
 			final float pitch = (float) -(Math.atan2(d2,
@@ -479,10 +479,10 @@ public abstract class AIHelper {
 			pitchInfluence = Math.min(pitchInfluence, clamp);
 			// TODO: Make this linear?
 
-			getClient().player.updatePositionAndAngles(
-					getClient().player.getX(),
-					getClient().player.getY(),
-					getClient().player.getZ(),
+			mc.player.updatePositionAndAngles(
+					mc.player.getX(),
+					mc.player.getY(),
+					mc.player.getZ(),
 					rotationYaw + yawChange * yawInfluence,
 					rotationPitch + pitchChange * pitchInfluence);
 			invalidateObjectMouseOver();
@@ -493,12 +493,13 @@ public abstract class AIHelper {
 	}
 	
 	public boolean selectCurrentItem(ItemFilter f) {
-		if (f.matches(getClient().player.getInventory().getMainHandStack())) {
+		mc = getClient();
+		if (f.matches(mc.player.getInventory().getMainHandStack())) {
 			return true;
 		}
 		for (int i = 0; i < 9; ++i) {
-			if (f.matches(getClient().player.getInventory().getStack(i))) {
-				getClient().player.getInventory().selectedSlot = i;
+			if (f.matches(mc.player.getInventory().getStack(i))) {
+				mc.player.getInventory().selectedSlot = i;
 				return true;
 			}
 		}
@@ -506,15 +507,17 @@ public abstract class AIHelper {
 	}
 	
 	public boolean arrivedAt(double x, double z) {
-		final double dx = x - getClient().player.getX();
-		final double dz = z - getClient().player.getZ();
+		mc = getClient();
+		final double dx = x - mc.player.getX();
+		final double dz = z - mc.player.getZ();
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		return distTo <= MIN_DISTANCE_ERROR;
 	}
 
 	public boolean isJumping() {
+		mc = getClient();
 		// func_233570_aj_ -> onGround
-		return !getClient().player.isOnGround();
+		return !mc.player.isOnGround();
 	}
 	
 	public static Direction getDirectionFor(BlockPos delta) {
@@ -527,7 +530,32 @@ public abstract class AIHelper {
 				+ delta);
 	}
 	
-	public StatsManager getStats() {
-		return stats;
+	protected boolean userTookOver() {
+		for (KeyboardInputController key : keys.values()) {
+			if (key.wasPressedByUser()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected void keyboardPostTick() {
+		for (KeyboardInputController k : keys.values()) {
+			k.doTick();
+		}
+	}
+	
+	public Direction getLookDirection() {
+		switch (MathHelper
+				.floor(getClient().player.getYaw() / 360 * 4 + .5) & 3) {
+		case 1:
+			return Direction.WEST;
+		case 2:
+			return Direction.NORTH;
+		case 3:
+			return Direction.EAST;
+		default:
+			return Direction.SOUTH;
+		}
 	}
 }

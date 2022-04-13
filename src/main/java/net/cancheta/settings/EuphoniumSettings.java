@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class EuphoniumSettings {
@@ -27,11 +26,8 @@ public class EuphoniumSettings {
 	private static final EuphoniumSettings INSTANCE = new EuphoniumSettings();
 
 	private EuphoniumSettingsRoot settings;
-	private ArrayList<String> keys;
 
 	private long settingsLastModified = 0;
-
-	private static Object mutex = new Object();
 
 	private EuphoniumSettings() {
 	}
@@ -103,23 +99,23 @@ public class EuphoniumSettings {
 	}
 
 	public static File getDataDir() {
-		File dir = new File(MinecraftClient.getInstance().runDirectory, "minebot");
-		LOGGER.trace(MARKER_SETTINGS, "Data directory: " + dir);
-		if (false && !dir.isDirectory()) {
+		MinecraftClient mc = MinecraftClient.getInstance();
+		File dir = new File(mc.runDirectory, "minebot");
+//		LOGGER.trace(MARKER_SETTINGS, "Data directory: " + dir);
+		
+		if (dir.isDirectory()) {
+			return dir;
+		} else {
 			try {
-				System.out.println("CREATING NEW DIR");
 				return new EuphoniumDirectoryCreator().createDirectory(dir);
 			} catch (IOException e) {
-				LOGGER.error(MARKER_SETTINGS, "Could not create settings directory.");
 				e.printStackTrace();
 			}
 		}
-
 		return dir;
 	}
 
 	public static File getDataDirFile(String name) {
-
 		return new File(getDataDir(), name);
 	}
 

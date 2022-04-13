@@ -12,11 +12,11 @@ public class RecordingWorld extends WorldWithDelta {
 	private static final int TIME_TO_PLACE = 5;
 	private static final int TIME_TO_FACE = 3;
 	private int timeInTicks = 0;
-	private final PlayerEntity blockBreaker;
+//	private final PlayerEntity blockBreaker;
 
 	public RecordingWorld(WorldData currentWorld, PlayerEntity blockBreaker) {
 		super(currentWorld);
-		this.blockBreaker = blockBreaker;
+//		this.blockBreaker = blockBreaker;
 	}
 
 	@Override

@@ -14,24 +14,24 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 public abstract class TaskStrategy extends AIStrategy implements TaskOperations, TaskReceiver{
-	private static final Marker MARKER_PREFACING = MarkerManager
-			.getMarker("preface");
+//	private static final Marker MARKER_PREFACING = MarkerManager
+//			.getMarker("preface");
 	private static final Marker MARKER_TASK = MarkerManager
 			.getMarker("task");
 	private static final Logger LOGGER = LogManager.getLogger(AIStrategy.class);
 	
 	private int desyncTimer = 0;
 	private boolean searchNewTasks = true;
-	private AIHelper temporaryHelper;
+//	private AIHelper temporaryHelper;
 	
 	protected final LinkedList<AITask> tasks = new LinkedList<AITask>();
 	private int taskTimeout;
-	private volatile AITask activeTask;
+//	private volatile AITask activeTask;
 	
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
 		if (desyncTimer > 0) {
-			activeTask = null;
+//			activeTask = null;
 			// clear the tasks
 			for (AITask t : tasks) {
 				t.onCanceled();
@@ -44,7 +44,7 @@ public abstract class TaskStrategy extends AIStrategy implements TaskOperations,
 		}
 
 		if (searchNewTasks) {
-			activeTask = null;
+//			activeTask = null;
 			searchAndPrintTasks(helper);
 			if (tasks.isEmpty()) {
 				LOGGER.debug(MARKER_TASK, "No more tasks found.");
@@ -54,7 +54,7 @@ public abstract class TaskStrategy extends AIStrategy implements TaskOperations,
 			searchNewTasks = false;
 		} else if (tasks.isEmpty()) {
 			searchNewTasks = true;
-			activeTask = null;
+//			activeTask = null;
 			return TickResult.TICK_AGAIN;
 		}
 
@@ -64,7 +64,7 @@ public abstract class TaskStrategy extends AIStrategy implements TaskOperations,
 			tasks.removeFirst();
 			LOGGER.debug(MARKER_TASK,"Next task will be: " + tasks.peekFirst());
 			taskTimeout = 0;
-			activeTask = null;
+//			activeTask = null;
 			return TickResult.TICK_AGAIN;
 		} else {
 			int tickTimeout = task.getGameTickTimeout(helper);
@@ -74,14 +74,14 @@ public abstract class TaskStrategy extends AIStrategy implements TaskOperations,
 				desync(new StringTaskError(
 						"Task timed out. It should have been completed in "
 								+ (tickTimeout / 20f) + "s"));
-				activeTask = null;
+//				activeTask = null;
 				return TickResult.TICK_HANDLED;
 			} else {
-				temporaryHelper = helper;
+//				temporaryHelper = helper;
 				task.runTick(helper, this);
-				temporaryHelper = null;
+//				temporaryHelper = null;
 				taskTimeout++;
-				activeTask = task;
+//				activeTask = task;
 				return TickResult.TICK_HANDLED;
 			}
 		}

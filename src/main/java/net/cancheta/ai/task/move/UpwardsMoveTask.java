@@ -2,7 +2,6 @@ package net.cancheta.ai.task.move;
 
 import net.cancheta.ai.AIHelper;
 import net.cancheta.ai.ItemFilter;
-import net.cancheta.ai.path.world.BlockSet;
 import net.cancheta.ai.path.world.BlockSets;
 import net.cancheta.ai.path.world.WorldWithDelta;
 import net.cancheta.ai.task.TaskOperations;

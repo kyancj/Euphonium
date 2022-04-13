@@ -7,9 +7,8 @@ import net.cancheta.ai.path.world.WorldWithDelta;
 import net.cancheta.ai.task.AITask;
 import net.cancheta.ai.task.WaitTask;
 import net.cancheta.ai.task.error.TaskError;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
-
-import net.cancheta.ai.AIHelper;
 
 public class PathFinderStrategy extends TaskStrategy {
 	private static final boolean DEBUG = false;
@@ -55,8 +54,9 @@ public class PathFinderStrategy extends TaskStrategy {
 	private boolean isInAir(AIHelper helper) {
 		//return Minecraft.getInstance().player.isAirBorne; //Change to get block beneath and if not air.
 		//55 for half-slabs
-		BlockPos under = new BlockPos(helper.getClient().player.getX(), helper.getClient().player.getY() - 0.55, helper.getClient().player.getZ());
-		return helper.getClient().world.isAir(under);
+		MinecraftClient mc = helper.getClient();
+		BlockPos under = new BlockPos(mc.player.getX(), mc.player.getY() - 0.55, mc.player.getZ());
+		return mc.world.isAir(under);
 
 		//Maybe Minecraft.getInstance() should be helper.getMinecraft().player ?
 
